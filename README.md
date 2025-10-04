@@ -3,6 +3,125 @@
 2. Mounir Khalil
 3. Hassan Khalil
 
+
+
+# 🕵️ Holmes Interrogation System
+
+Holmes Interrogation System is a **Sherlock Holmes–themed, graph-based investigation assistant**.  
+It helps investigators conduct structured interrogations, **convert dialogue into a knowledge graph**, and **suggest the next best questions** intelligently.
+
+---
+
+## 📌 Features
+
+- 🎙️ **Two-phase interrogation flow** — Investigator Question → Suspect Answer  
+- 🧠 **Live Knowledge Graph** — Entities (people, places, times) and relations auto-generated from answers  
+- 💬 **Graph-aware question suggestions** — Automatically generated after each answer to guide the investigation  
+- 🌐 **Modern React-like UI** — Victorian Sherlock Holmes theme with clean two-view layout  
+- 🧭 **Graph analysis assistant** — Lets you chat with the case graph to find gaps or contradictions  
+- 🐳 **Dockerized setup** — Easy to run with a single command  
+- 🤖 Optional **LLM integration** — Uses OpenAI-compatible models for question generation and extraction
+
+---
+
+## 🏗️ Architecture Overview
+
+```
+Frontend (React-like / Streamlit)
+   │
+   ▼
+FastAPI Backend
+   │
+   ├─ PostgreSQL + pgvector  → stores transcripts & embeddings
+   ├─ Neo4j (via Graphiti)   → stores temporal knowledge graph
+   └─ LLM Providers (OpenAI, etc.) → question suggestion + entity extraction
+```
+
+---
+
+## 🧪 Demo Scenario
+
+The demo follows an example interrogation in **8 rounds**, showing the graph grow after each answer:
+
+| Round | Investigator Question | Suspect Answer | Graph Update |
+|-------|--------------------------|----------------|-------------|
+| 1 | Please state your name. | My name is Michael Turner. | Add Person: Michael Turner |
+| 2 | Where were you on June 12 at 8 p.m.? | Jack’s Diner, 5th Street. | Add Location & Time edge |
+| 3 | (Suggested) Were you alone? | With Daniel. | Add Person Daniel, met_with edge |
+| 4 | (Suggested) Daniel’s full name? | Daniel Green. | Add Daniel Green node |
+| 5 | You "think"? | Met Dan at gym weeks ago. | Add alias, gym node |
+| 6 | After diner? | Riverside Park until 10. | Add second location + time window |
+| 7 | Witness saw you at Oak Street. | No, I was at the park. | Add witness claim contradiction |
+| 8 | Anyone confirm? | Security cameras. | Add evidence source node |
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/your-username/holmes-interrogation-system.git
+cd holmes-interrogation-system
+```
+
+### 2. Build and run with Docker
+```bash
+docker build -t holmes-interrogation .
+docker run -p 8501:8501 holmes-interrogation
+```
+
+Then open [http://localhost:8501](http://localhost:8501) in your browser.
+
+### 3. (Optional) Set OpenAI API Key
+For LLM-based entity extraction and question generation:
+```bash
+export OPENAI_API_KEY=your_key_here
+```
+
+---
+
+## 🧠 Research Inspiration
+
+This project builds on modern research in:
+- **Conversational Knowledge Graphs** — using graphs as evolving dialogue memory  
+- **Follow-up Question Generation over Graphs** — improving investigative coverage  
+- **Field-tested Investigation Tools** — i2 Analyst’s Notebook, Maltego, Linkurious
+
+Our innovation is making this process **live and interactive**:  
+🎤 speech → 🧠 graph → ❓next question.
+
+---
+
+## 📜 Hackathon Alignment
+
+✅ Converts data into graph representations  
+✅ Uses graphs creatively to guide the investigation  
+✅ Public GitHub repo & Dockerized  
+✅ Optional LLM features  
+✅ Themed UI and workflow matching investigative logic
+
+---
+
+## 👨‍💻 Contributors
+
+- 👨‍🏫 **Implementation & Demo** — Haidar, Hassan, and Mounir
+- 📚 **Research & Integration** — Open-source repos, academic papers
+
+---
+
+## 📝 License
+
+MIT License. See [LICENSE](LICENSE) for details.
+
+
+
+
+
+
+# For the Backend:
+
+
+
 # Agentic RAG with Knowledge Graph
 
 Agentic knowledge retrieval redefined with an AI agent system that combines traditional RAG (vector search) with knowledge graph capabilities to analyze and provide questions for investigators. The system uses PostgreSQL with pgvector for semantic search and Neo4j with Graphiti for temporal knowledge graphs. The goal is to create Agentic RAG at its finest.
