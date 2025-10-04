@@ -15,10 +15,8 @@ from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.staticfiles import StaticFiles
 import uvicorn
 from dotenv import load_dotenv
-from pathlib import Path
 
 from .agent import rag_agent, AgentDependencies
 from .db_utils import (
@@ -140,11 +138,6 @@ app.add_middleware(
 )
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
-
-# Mount static files directory for serving graph PNGs
-static_path = Path(__file__).parent.parent / "static"
-static_path.mkdir(parents=True, exist_ok=True)
-app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
 
 # Include investigation-specific routers
 app.include_router(investigation_router)
