@@ -59,11 +59,6 @@ class AgenticRAGCLI:
 {Colors.BOLD}Usage:{Colors.END}
   Simply type your question and press Enter to chat with the agent.
   The agent has access to vector search, knowledge graph, and hybrid search tools.
-  
-{Colors.BOLD}Examples:{Colors.END}
-  - "What are Google's AI initiatives?"
-  - "Tell me about Microsoft's partnerships with OpenAI"
-  - "Compare OpenAI and Anthropic's approaches to AI safety"
 """
         print(help_text)
     
@@ -203,7 +198,7 @@ class AgenticRAGCLI:
             print(f"{Colors.RED}Cannot connect to API. Please ensure the server is running.{Colors.END}")
             return
         
-        print(f"{Colors.GREEN}Ready to chat! Ask me about tech companies and AI initiatives.{Colors.END}\n")
+        print(f"{Colors.GREEN}Ready to chat! Ask me for the next question.{Colors.END}\n")
         
         try:
             while True:

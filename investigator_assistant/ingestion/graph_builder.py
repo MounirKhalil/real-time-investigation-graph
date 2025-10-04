@@ -209,8 +209,6 @@ class GraphBuilder:
         
         Args:
             chunks: List of document chunks
-            extract_companies: Whether to extract company names
-            extract_technologies: Whether to extract technology terms
             extract_people: Whether to extract person names
         
         Returns:
