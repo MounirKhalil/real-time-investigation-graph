@@ -27,7 +27,12 @@ from .graph_visualization import (
     generate_graph_url
 )
 from .prompts import INVESTIGATION_QA_PROMPT
-from .db_utils import create_session
+from .db_utils import create_session, add_message
+from .file_based_storage import (
+    append_qa_to_file,
+    regenerate_graph,
+    generate_graph_png
+)
 
 logger = logging.getLogger(__name__)
 
@@ -185,10 +190,11 @@ async def submit_qa(request: QASubmissionRequest):
     Submit a Q&A pair from the Investigation Room.
     
     This endpoint:
-    1. Adds the Q&A to the knowledge graph as an episode
-    2. Analyzes the answer for gaps, contradictions, and ambiguities
-    3. Generates suggested follow-up questions
-    4. Returns the graph visualization URL
+    1. Appends Q&A to session.md file
+    2. Regenerates the knowledge graph from the file
+    3. Generates PNG visualization of the graph
+    4. Analyzes the answer for gaps, contradictions, and ambiguities
+    5. Returns suggested questions and PNG URL
     """
     try:
         logger.info(f"Received Q&A submission: Q='{request.question[:50]}...' A='{request.answer[:50]}...'")
@@ -198,31 +204,43 @@ async def submit_qa(request: QASubmissionRequest):
         if not session_id:
             session_id = str(uuid.uuid4())
         
-        # Step 1: Add Q&A to knowledge graph
-        if graph_client and graph_client._initialized:
-            try:
-                # Combine Q&A into episode content
-                episode_content = f"Q: {request.question}\nA: {request.answer}"
-                
-                await graph_client.add_episode(
-                    episode_id=str(uuid.uuid4()),
-                    content=episode_content,
-                    source="investigation_room",
-                    timestamp=datetime.now(timezone.utc),
-                    metadata={
-                        "question": request.question,
-                        "answer": request.answer,
-                        "session_id": session_id
-                    }
-                )
-                logger.info("Successfully added Q&A to knowledge graph")
-            except Exception as e:
-                logger.error(f"Failed to add Q&A to knowledge graph: {e}")
-                # Continue anyway - we can still analyze
-        else:
-            logger.warning("Graph client not initialized, skipping graph update")
+        # Step 1: Append Q&A to session.md file
+        logger.info("Appending Q&A to session.md file...")
+        append_success = await append_qa_to_file(
+            question=request.question,
+            answer=request.answer
+        )
         
-        # Step 2: Analyze the Q&A pair
+        if not append_success:
+            logger.error("Failed to append Q&A to file")
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to save Q&A to session file"
+            )
+        
+        # Step 2: Regenerate knowledge graph from the updated file
+        logger.info("Regenerating knowledge graph from session.md...")
+        regen_success = await regenerate_graph()
+        
+        if not regen_success:
+            logger.warning("Graph regeneration failed, continuing anyway")
+        
+        # Step 3: Generate PNG visualization of the graph
+        logger.info("Generating graph PNG...")
+        png_path = await generate_graph_png()
+        
+        if png_path:
+            # Convert to URL accessible from frontend
+            base_url = os.getenv("APP_BASE_URL", "http://localhost:8058")
+            graph_url = f"{base_url}/static/{png_path.replace(os.sep, '/')}"
+            logger.info(f"Graph PNG generated: {graph_url}")
+        else:
+            # Fallback URL
+            graph_url = f"{os.getenv('APP_BASE_URL', 'http://localhost:8058')}/graph/data"
+            logger.warning("Failed to generate PNG, using fallback URL")
+        
+        # Step 4: Analyze the Q&A pair for suggested questions
+        logger.info("Analyzing Q&A for suggested questions...")
         analysis = await analyze_qa_pair(
             question=request.question,
             answer=request.answer,
@@ -231,10 +249,7 @@ async def submit_qa(request: QASubmissionRequest):
         
         logger.info(f"Analysis complete, found {len(analysis.suggested_questions)} questions")
         
-        # Step 3: Generate graph URL
-        graph_url = generate_graph_url(session_id=session_id)
-        
-        # Step 4: Return response
+        # Step 5: Return response
         return QASubmissionResponse(
             suggestedQuestions=analysis.suggested_questions,
             graphUrl=graph_url,
