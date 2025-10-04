@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Victorian Sherlock Holmes Theme */
+    --background: 30 15% 92%; /* Aged paper cream */
+    --foreground: 25 30% 15%; /* Deep brown text */
+
+    --card: 35 25% 88%; /* Vintage parchment */
+    --card-foreground: 25 30% 15%;
+
+    --popover: 35 25% 88%;
+    --popover-foreground: 25 30% 15%;
+
+    --primary: 25 45% 25%; /* Rich Victorian brown */
+    --primary-foreground: 35 30% 95%;
+
+    --secondary: 0 35% 45%; /* Burgundy/wine */
+    --secondary-foreground: 35 30% 95%;
+
+    --muted: 30 20% 75%; /* Muted tan */
+    --muted-foreground: 25 20% 35%;
+
+    --accent: 15 50% 50%; /* Brass/gold accent */
+    --accent-foreground: 25 30% 15%;
+
+    --destructive: 0 60% 45%;
+    --destructive-foreground: 35 30% 95%;
+
+    --border: 30 20% 70%; /* Warm border */
+    --input: 35 20% 85%;
+    --ring: 25 45% 25%;
+
+    --radius: 0.25rem; /* Sharper Victorian edges */
+
+    --sidebar-background: 30 15% 88%;
+    --sidebar-foreground: 25 30% 15%;
+    --sidebar-primary: 25 45% 25%;
+    --sidebar-primary-foreground: 35 30% 95%;
+    --sidebar-accent: 30 20% 80%;
+    --sidebar-accent-foreground: 25 30% 15%;
+    --sidebar-border: 30 20% 70%;
+    --sidebar-ring: 25 45% 25%;
+
+    /* Custom Victorian variables */
+    --vintage-paper: 35 25% 88%;
+    --leather-brown: 25 45% 25%;
+    --brass-gold: 15 50% 50%;
+    --burgundy: 0 35% 45%;
+  }
+
+  .dark {
+    /* Dark Victorian Study Theme */
+    --background: 25 25% 12%; /* Dark wood */
+    --foreground: 35 20% 85%; /* Warm light text */
+
+    --card: 25 20% 18%;
+    --card-foreground: 35 20% 85%;
+
+    --popover: 25 20% 18%;
+    --popover-foreground: 35 20% 85%;
+
+    --primary: 35 30% 75%; /* Light leather */
+    --primary-foreground: 25 25% 12%;
+
+    --secondary: 0 40% 50%; /* Rich burgundy */
+    --secondary-foreground: 35 20% 85%;
+
+    --muted: 25 15% 25%;
+    --muted-foreground: 35 15% 60%;
+
+    --accent: 15 55% 55%; /* Bright brass */
+    --accent-foreground: 25 25% 12%;
+
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 35 20% 85%;
+
+    --border: 25 15% 30%;
+    --input: 25 15% 25%;
+    --ring: 15 55% 55%;
+    
+    --sidebar-background: 25 20% 15%;
+    --sidebar-foreground: 35 20% 85%;
+    --sidebar-primary: 15 55% 55%;
+    --sidebar-primary-foreground: 25 25% 12%;
+    --sidebar-accent: 25 15% 25%;
+    --sidebar-accent-foreground: 35 20% 85%;
+    --sidebar-border: 25 15% 30%;
+    --sidebar-ring: 15 55% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Georgia', 'Times New Roman', serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-weight: 600;
+  }
+}
+
+/* Victorian texture overlay */
+@layer utilities {
+  .vintage-texture {
+    background-image: 
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        hsl(var(--background)) 2px,
+        hsl(var(--background)) 4px
+      );
+  }
+  
+  .leather-texture {
+    background-image: 
+      radial-gradient(circle at 20% 50%, transparent 0%, hsl(var(--primary) / 0.05) 100%),
+      radial-gradient(circle at 80% 50%, transparent 0%, hsl(var(--primary) / 0.05) 100%);
+  }
+}
