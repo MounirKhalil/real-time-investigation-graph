@@ -49,6 +49,11 @@ from .tools import (
     HybridSearchInput,
     DocumentListInput
 )
+from .investigation_api import (
+    investigation_router,
+    analysis_router,
+    graph_router
+)
 
 # Load environment variables
 load_dotenv()
@@ -117,8 +122,8 @@ async def lifespan(app: FastAPI):
 
 # Create FastAPI app
 app = FastAPI(
-    title="Agentic RAG with Knowledge Graph",
-    description="AI agent combining vector search and knowledge graph for tech company analysis",
+    title="Investigator Assistant - Agentic RAG with Knowledge Graph",
+    description="AI agent for analyzing interrogation transcripts using vector search and knowledge graph",
     version="0.1.0",
     lifespan=lifespan
 )
@@ -133,6 +138,11 @@ app.add_middleware(
 )
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# Include investigation-specific routers
+app.include_router(investigation_router)
+app.include_router(analysis_router)
+app.include_router(graph_router)
 
 
 # Helper functions for agent execution

@@ -250,3 +250,81 @@ class HealthStatus(BaseModel):
     llm_connection: bool
     version: str
     timestamp: datetime
+
+
+# Investigation Room Models
+class QASubmissionRequest(BaseModel):
+    """Request model for Q&A submission from Investigation Room."""
+    question: str = Field(..., description="The question that was asked")
+    answer: str = Field(..., description="The suspect's answer")
+    session_id: Optional[str] = Field(None, description="Optional session ID for tracking")
+    
+    @field_validator('question', 'answer')
+    @classmethod
+    def validate_not_empty(cls, v: str) -> str:
+        """Ensure question and answer are not empty."""
+        if not v.strip():
+            raise ValueError("Field cannot be empty")
+        return v.strip()
+
+
+class QASubmissionResponse(BaseModel):
+    """Response model for Q&A submission."""
+    suggestedQuestions: List[str] = Field(..., description="Suggested follow-up questions")
+    graphUrl: str = Field(..., description="URL to the updated knowledge graph visualization")
+    analysis: Optional[str] = Field(None, description="Optional analysis text")
+    session_id: Optional[str] = Field(None, description="Session ID for tracking")
+
+
+class AnalysisChatRequest(BaseModel):
+    """Request model for Analysis Assistant chat."""
+    prompt: str = Field(..., description="The user's question or instruction")
+    
+    @field_validator('prompt')
+    @classmethod
+    def validate_prompt(cls, v: str) -> str:
+        """Ensure prompt is not empty."""
+        if not v.strip():
+            raise ValueError("Prompt cannot be empty")
+        return v.strip()
+
+
+class AnalysisChatResponse(BaseModel):
+    """Response model for Analysis Assistant chat."""
+    answer: str = Field(..., description="The AI assistant's response")
+
+
+# Graph Visualization Models
+class GraphNode(BaseModel):
+    """Graph node for visualization."""
+    id: str = Field(..., description="Node unique identifier")
+    label: str = Field(..., description="Node display label")
+    type: str = Field(..., description="Node type (Person, Place, Event, etc.)")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional node properties")
+
+
+class GraphEdge(BaseModel):
+    """Graph edge for visualization."""
+    from_node: str = Field(..., alias="from", description="Source node ID")
+    to_node: str = Field(..., alias="to", description="Target node ID")
+    label: str = Field(..., description="Relationship type/label")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional edge properties")
+    
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class GraphVisualizationData(BaseModel):
+    """Graph visualization data for frontend rendering."""
+    nodes: List[GraphNode] = Field(default_factory=list, description="Graph nodes")
+    edges: List[GraphEdge] = Field(default_factory=list, description="Graph edges")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Graph metadata")
+
+
+# Structured Investigation Response
+class InvestigationAnalysis(BaseModel):
+    """Structured analysis response from investigation agent."""
+    analysis: str = Field(..., description="Analysis of the Q&A pair")
+    suggested_questions: List[str] = Field(..., description="Suggested follow-up questions")
+    contradictions_found: List[str] = Field(default_factory=list, description="Detected contradictions")
+    missing_information: List[str] = Field(default_factory=list, description="Identified gaps")
+    key_entities: List[str] = Field(default_factory=list, description="Key entities mentioned")
